@@ -41,6 +41,16 @@ class Signin extends React.Component {
       })
   }
 
+  onSubmitSignInAsGuest = () => {
+    this.setState({
+      signInEmail: 'test@gmail.com', signInPassword: 'test1234'
+    });
+
+    //this timeout will make sure that the signin function runs at the end 
+    //after the state changes are applied by react
+    setTimeout(() => this.onSubmitSignIn(), 0);
+  }
+
   render() {
     const { onRouteChange } = this.props;
     return (
@@ -76,6 +86,14 @@ class Signin extends React.Component {
                 className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
                 type="submit"
                 value="Sign in"
+              />
+            </div>
+            <div className="">
+              <input
+                onClick={this.onSubmitSignInAsGuest}
+                className="mt2 b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
+                type="submit"
+                value="Sign in as Guest"
               />
             </div>
             <div className="lh-copy mt3">
