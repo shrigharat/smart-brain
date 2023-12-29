@@ -9,6 +9,7 @@ import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import './App.css';
+import { Toaster, toast } from 'react-hot-toast';
 
 const initialState = {
   input: '',
@@ -35,19 +36,25 @@ class App extends Component {
   componentDidMount = async () => {
     const token = window.sessionStorage.getItem('token');
     if(token) {
-      const response = await fetch('http://localhost:3000/signin', {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/signin`, {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          }
+        });
+        const data = await response.json();
+        if(data.success) {
+          //set user
+          this.setState({isSignedIn: true});
+          this.loadUser(data.userData);
+          toast("Sign in successfull!");
+        } else {
+          this.setState({route: 'signin'});
         }
-      });
-      const data = await response.json();
-      if(data.success) {
-        //set user
-        this.setState({isSignedIn: true});
-        this.loadUser(data.userData);
-      } else {
+      } catch (error) {
+        toast("Could not signin!");
         this.setState({route: 'signin'});
       }
     } else {
@@ -98,7 +105,7 @@ class App extends Component {
   onButtonSubmit = () => {
     const token = window.sessionStorage.getItem('token');
     this.setState({imageUrl: this.state.input});
-    fetch('http://localhost:3000/imageurl', {
+    fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/imageurl`, {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -112,7 +119,7 @@ class App extends Component {
     .then(response => {
       if(response)
       if (response) {
-        fetch('http://localhost:3000/image', {
+        fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/image`, {
           method: 'put',
           headers: {
             'Content-Type': 'application/json',
@@ -139,7 +146,7 @@ class App extends Component {
     if (route === 'signout') {
       if(this.state.isSignedIn) {
         const token = window.sessionStorage.getItem('token');
-        fetch('http://localhost:3000/signout', {
+        fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/signout`, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token,
@@ -162,6 +169,7 @@ class App extends Component {
         <ParticlesBg type="circle" bg={true} />
         <div className='bluroverlay'>
         </div>
+        <Toaster />
         <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
         { route === 'home'
           ? <div>
